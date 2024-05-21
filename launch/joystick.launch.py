@@ -6,9 +6,10 @@ from launch.actions import DeclareLaunchArgument
 import os
 from ament_index_python.packages import get_package_share_directory
 
+
 def generate_launch_description():
     pkg_share_dir = get_package_share_directory('otomo_core')
-    
+
     use_sim_time = LaunchConfiguration('use_sim_time')
 
     joy_params = os.path.join(pkg_share_dir, 'config', 'joystick.yaml')
