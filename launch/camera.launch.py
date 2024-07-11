@@ -21,6 +21,7 @@ def generate_launch_description():
         package='v4l2_camera',
         executable='v4l2_camera_node',
         output='screen',
+        namespace='camera',
         parameters=[{
             'use_sim_time': use_sim_time,
             'video_device': video_device,
