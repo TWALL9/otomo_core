@@ -28,7 +28,7 @@ add_executable(serial_broadcaster_node
 ament_target_dependencies(serial_broadcaster_node rclcpp std_msgs async_serial)
 
 install(TARGETS serial_broadcaster_node
-  DESTINATION bin
+  DESTINATION lib/${PROJECT_NAME}
 )
 
 if(BUILD_TESTING)
