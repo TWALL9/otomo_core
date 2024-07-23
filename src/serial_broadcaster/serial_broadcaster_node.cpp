@@ -12,18 +12,27 @@ using namespace std::chrono_literals;
 class SerialBroadcasterNode : public rclcpp::Node {
 public:
   SerialBroadcasterNode() : Node("SerialBroadcasterNode") {
-    // this->declare_parameter("serial_port" "/dev/ttyUSB0");
-    // this->declare_parameter("baud_rate", 115200);
+    this->declare_parameter("serial_port", "/dev/ttyUSB0");
+    this->declare_parameter("baud_rate", 115200);
 
-    // std::string port_path = this->get_parameter("serial_port").as_string();
-    // int baud_rate = this->get_parameter("baud rate").as_int();
-    // port_ = std::make_unique<async_serial::SerialPort>(port_path, baud_rate);
-    port_ = std::make_unique<async_serial::SerialPort>("/dev/ttyUSB0", 115200);
-    port_->open();
+    port_path_ = this->get_parameter("serial_port").as_string();
+    baud_rate_ = this->get_parameter("baud_rate").as_int();
+    port_ = std::make_unique<async_serial::SerialPort>(port_path_, baud_rate_);
+  }
 
-    port_->add_receive_callback(std::bind(
-      &SerialBroadcasterNode::serial_callback, this, std::placeholders::_1, std::placeholders::_2
-    ));
+  bool open() {
+    bool ret = false;
+
+    if (port_->open()) {
+      port_->add_receive_callback(std::bind(
+        &SerialBroadcasterNode::serial_callback, this, std::placeholders::_1, std::placeholders::_2
+      ));
+      ret = true;
+    } else {
+      RCLCPP_ERROR(this->get_logger(), "Cannot open port!");
+    }
+
+    return ret;
   }
 
 private:
@@ -52,11 +61,15 @@ private:
   }
 
   std::unique_ptr<async_serial::SerialPort> port_;
+  std::string port_path_;
+  uint32_t baud_rate_;
 };
 
 int main(int argc, char * argv[]) {
   rclcpp::init(argc, argv);
-  rclcpp::spin(std::make_shared<SerialBroadcasterNode>());
+  auto broadcaster_node = std::make_shared<SerialBroadcasterNode>();
+  broadcaster_node->open();
+  rclcpp::spin(broadcaster_node);
   rclcpp::shutdown();
 
   return 0;
