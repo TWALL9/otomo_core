@@ -29,7 +29,7 @@ public:
       ));
       ret = true;
     } else {
-      RCLCPP_ERROR(this->get_logger(), "Cannot open port!");
+      RCLCPP_FATAL(this->get_logger(), "Cannot open port!");
     }
 
     return ret;
@@ -68,7 +68,11 @@ private:
 int main(int argc, char * argv[]) {
   rclcpp::init(argc, argv);
   auto broadcaster_node = std::make_shared<SerialBroadcasterNode>();
-  broadcaster_node->open();
+  
+  if (!broadcaster_node->open()) {
+    exit(1);
+  }
+
   rclcpp::spin(broadcaster_node);
   rclcpp::shutdown();
 
