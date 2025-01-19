@@ -28,14 +28,6 @@ def generate_launch_description():
             remappings=[('/cmd_vel', '/cmd_vel_joy')]
         )
 
-    twist_stamper = Node(
-        package='twist_stamper',
-        executable='twist_stamper',
-        parameters=[{'use_sim_time': use_sim_time}],
-        remappings=[('/cmd_vel_in','/diff_controller/cmd_vel_unstamped'),
-                    ('/cmd_vel_out','/diff_controller/cmd_vel')]
-        )
-
     return LaunchDescription([
         DeclareLaunchArgument(
             'use_sim_time',
@@ -43,5 +35,4 @@ def generate_launch_description():
             description='Use sim time if true'),
         joy_node,
         teleop_node,
-        twist_stamper,
     ])
