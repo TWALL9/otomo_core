@@ -37,25 +37,24 @@ public:
 
 private:
   void serial_callback(const std::vector<uint8_t>& buf, size_t bytes_received) {
-    (void)bytes_received;
-    std::string received(buf.begin(), buf.end());
+    std::string received((char*)buf.data(), bytes_received);
     std::stringstream received_stream(received);
     std::string log;
     size_t n;
-    while(std::getline(received_stream, log)) {
+    while(std::getline(received_stream, log, '\n')) {
       // TODO substring based on these positions
       if ((n = log.find("[TRACE] ")) != log.npos) {
-        RCLCPP_INFO(this->get_logger(), "%s", log.c_str());
+        RCLCPP_DEBUG(this->get_logger(), "%s", log.c_str());
       } else if ((n = log.find("[DEBUG] ")) != log.npos) {
-        RCLCPP_INFO(this->get_logger(), "%s", log.c_str());
+        RCLCPP_DEBUG(this->get_logger(), "%s", log.c_str());
       } else if ((n = log.find("[INFO] ")) != log.npos) {
         RCLCPP_INFO(this->get_logger(), "%s", log.c_str());
       } else if ((n = log.find("[WARN] ")) != log.npos) {
         RCLCPP_WARN(this->get_logger(), "%s", log.c_str());
       } else if ((n = log.find("[ERROR] ")) != log.npos) {
         RCLCPP_ERROR(this->get_logger(), "%s", log.c_str());
-      } else {
-        RCLCPP_INFO(this->get_logger(), "unknown firmware log: %s", log.c_str());
+      // } else {
+      //   RCLCPP_INFO(this->get_logger(), "unknown firmware log: %s", log.c_str());
       }
     }
   }
@@ -68,7 +67,7 @@ private:
 int main(int argc, char * argv[]) {
   rclcpp::init(argc, argv);
   auto broadcaster_node = std::make_shared<SerialBroadcasterNode>();
-  
+
   if (!broadcaster_node->open()) {
     exit(1);
   }
